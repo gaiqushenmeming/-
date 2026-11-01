@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>欢乐对战屋 - Cartoon Battle House</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ 主菜单 ============ -->
+  <div id="screen-menu" class="screen active">
+    <div class="menu-bg">
+      <div class="bubble b1"></div><div class="bubble b2"></div>
+      <div class="bubble b3"></div><div class="bubble b4"></div>
+    </div>
+    <div class="menu-card">
+      <h1 class="title">🎮 欢乐对战屋 🎮</h1>
+      <p class="subtitle">双人 / 联机 / 人机 · 卡通大乱斗</p>
+      <div class="player-info">
+        <span class="coin">🪙 <b id="coin-display">0</b></span>
+        <span class="score">⭐ <b id="score-display">0</b></span>
+      </div>
+      <div class="menu-grid">
+        <button class="menu-btn big" data-game="tank">🚗 坦克大战</button>
+        <button class="menu-btn big" data-game="pong">🏓 弹球对决</button>
+        <button class="menu-btn big" data-game="snake">🐍 贪吃蛇战</button>
+        <button class="menu-btn big" data-game="bounce">💣 弹射炸弹</button>
+      </div>
+      <div class="menu-row">
+        <button class="menu-btn" id="btn-shop">🛍️ 皮肤商店</button>
+        <button class="menu-btn" id="btn-settings">⚙️ 设置</button>
+        <button class="menu-btn" id="btn-help">❓ 玩法</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 模式选择 ============ -->
+  <div id="screen-mode" class="screen">
+    <div class="center-card">
+      <h2 id="mode-game-title">选择模式</h2>
+      <div class="mode-list">
+        <button class="mode-btn" data-mode="local">
+          <span class="mode-ico">🎮</span>
+          <span class="mode-name">本地双人</span>
+          <span class="mode-desc">同一台设备，两人对战</span>
+        </button>
+        <button class="mode-btn" data-mode="ai">
+          <span class="mode-ico">🤖</span>
+          <span class="mode-name">人机对战</span>
+          <span class="mode-desc">挑战电脑AI</span>
+        </button>
+        <button class="mode-btn" data-mode="online">
+          <span class="mode-ico">🌐</span>
+          <span class="mode-name">远程联机</span>
+          <span class="mode-desc">创建/加入房间码对战</span>
+        </button>
+      </div>
+      <button class="back-btn" onclick="App.show('menu')">← 返回菜单</button>
+    </div>
+  </div>
+
+  <!-- ============ 联机房间 ============ -->
+  <div id="screen-online" class="screen">
+    <div class="center-card">
+      <h2>🌐 远程联机</h2>
+      <div class="online-status" id="online-status">未连接</div>
+      <div class="online-actions">
+        <button class="mode-btn" id="btn-create-room">
+          <span class="mode-ico">➕</span>
+          <span class="mode-name">创建房间</span>
+          <span class="mode-desc">成为房主，等待对手</span>
+        </button>
+        <div class="join-box">
+          <input type="text" id="room-code-input" maxlength="6" placeholder="输入6位房间码" class="code-input">
+          <button class="menu-btn" id="btn-join-room">加入房间</button>
+        </div>
+      </div>
+      <div class="room-info" id="room-info" style="display:none">
+        <div class="room-code-big">房间码：<b id="room-code-display">------</b></div>
+        <div class="room-players" id="room-players">等待对手加入...</div>
+        <button class="menu-btn primary" id="btn-start-online" disabled>开始对战</button>
+        <button class="menu-btn" id="btn-leave-room">离开房间</button>
+      </div>
+      <button class="back-btn" onclick="App.leaveOnline()">← 返回</button>
+    </div>
+  </div>
+
+  <!-- ============ 游戏画面 ============ -->
+  <div id="screen-game" class="screen">
+    <div class="game-top">
+      <div class="hud">
+        <div class="hud-player p1"><span id="p1-name">玩家1</span> <b id="p1-score">0</b></div>
+        <div class="hud-vs">VS</div>
+        <div class="hud-player p2"><b id="p2-score">0</b> <span id="p2-name">玩家2</span></div>
+      </div>
+      <button class="icon-btn" onclick="App.quitGame()">✖</button>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="game-canvas" width="900" height="600"></canvas>
+    </div>
+    <div class="game-bottom">
+      <div id="touch-controls"></div>
+      <div class="game-tip" id="game-tip"></div>
+    </div>
+  </div>
+
+  <!-- ============ 结算 ============ -->
+  <div id="screen-result" class="screen">
+    <div class="center-card result-card">
+      <h2 id="result-title">胜利！</h2>
+      <div class="result-body">
+        <div id="result-detail"></div>
+        <div class="reward">🪙 获得 <b id="reward-coin">0</b> 金币</div>
+      </div>
+      <div class="menu-row">
+        <button class="menu-btn primary" onclick="App.rematch()">🔁 再来一局</button>
+        <button class="menu-btn" onclick="App.show('menu')">🏠 回主菜单</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 皮肤商店 ============ -->
+  <div id="screen-shop" class="screen">
+    <div class="center-card wide">
+      <h2>🛍️ 皮肤商店</h2>
+      <div class="shop-info">我的金币：<b id="shop-coin">0</b> 🪙</div>
+      <div class="shop-grid" id="shop-grid"></div>
+      <button class="back-btn" onclick="App.show('menu')">← 返回菜单</button>
+    </div>
+  </div>
+
+  <!-- ============ 设置 ============ -->
+  <div id="screen-settings" class="screen">
+    <div class="center-card">
+      <h2>⚙️ 设置</h2>
+      <div class="setting-item">
+        <label>🔊 音效音量</label>
+        <input type="range" id="set-sfx" min="0" max="100" value="60">
+      </div>
+      <div class="setting-item">
+        <label>🎵 音乐音量</label>
+        <input type="range" id="set-bgm" min="0" max="100" value="40">
+      </div>
+      <div class="setting-item">
+        <label>🎯 游戏难度（AI）</label>
+        <select id="set-difficulty">
+          <option value="easy">简单</option>
+          <option value="normal" selected>普通</option>
+          <option value="hard">困难</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label>📱 触屏控制</label>
+        <select id="set-touch">
+          <option value="auto" selected>自动</option>
+          <option value="on">始终开启</option>
+          <option value="off">关闭</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label>🌐 联机服务器</label>
+        <input type="text" id="set-server" placeholder="ws://服务器地址:端口">
+      </div>
+      <div class="setting-item">
+        <label>👤 我的昵称</label>
+        <input type="text" id="set-nickname" maxlength="12" placeholder="玩家1">
+      </div>
+      <button class="menu-btn primary" onclick="App.saveSettings()">💾 保存设置</button>
+      <button class="back-btn" onclick="App.show('menu')">← 返回菜单</button>
+    </div>
+  </div>
+
+  <!-- ============ 玩法说明 ============ -->
+  <div id="screen-help" class="screen">
+    <div class="center-card wide">
+      <h2>❓ 玩法说明</h2>
+      <div class="help-content">
+        <h3>🎮 本地双人按键</h3>
+        <p><b>玩家1：</b>W A S D 移动 / 空格 射击或发射</p>
+        <p><b>玩家2：</b>方向键 ↑↓←→ 移动 / Enter 射击或发射</p>
+        <h3>📱 触屏操作</h3>
+        <p>移动端会自动显示虚拟摇杆和按钮，玩家1在左，玩家2在右。</p>
+        <h3>🌐 联机说明</h3>
+        <p>一人创建房间获取6位房间码，另一人输入房间码加入。房主点击"开始对战"即可开局。</p>
+        <h3>💰 金币与皮肤</h3>
+        <p>每局获胜可获得金币，在皮肤商店兑换不同颜色和造型的角色皮肤。</p>
+      </div>
+      <button class="back-btn" onclick="App.show('menu')">← 返回菜单</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- 提示弹窗 -->
+<div id="toast" class="toast"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/input.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/net.js"></script>
+<script src="js/core.js"></script>
+<script src="js/games/tank.js"></script>
+<script src="js/games/pong.js"></script>
+<script src="js/games/snake.js"></script>
+<script src="js/games/bounce.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "cartoon-battle-house",
+  "version": "1.0.0",
+  "description": "欢乐对战屋 - 卡通风格双人对战网页游戏（含联机服务器）",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node server/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}

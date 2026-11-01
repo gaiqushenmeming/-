@@ -1,0 +1,12 @@
+{
+  "name": "cartoon-battle-house-server",
+  "version": "1.0.0",
+  "description": "欢乐对战屋 联机服务器",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}
